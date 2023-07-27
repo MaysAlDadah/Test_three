@@ -13,22 +13,33 @@ class RenameNameInCompaniesTable extends Migration
      */
     public function up()
     {
-        // TASK: write the migration to rename the column "title" into "name"
+        // Add the new `name` column
         Schema::table('companies', function (Blueprint $table) {
-            // Write code here
-            $table->renameColumn('title', 'name');
+            $table->string('name')->after('title');
+        });
+
+        // Copy data from the `title` column to the new `name` column
+        DB::statement('UPDATE companies SET name = title');
+
+        // Remove the `title` column
+        Schema::table('companies', function (Blueprint $table) {
+            $table->dropColumn('title');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
+        // Add the `title` column back
         Schema::table('companies', function (Blueprint $table) {
-            //
+            $table->string('title')->after('name');
+        });
+
+        // Copy data from the `name` column back to the `title` column
+        DB::statement('UPDATE companies SET title = name');
+
+        // Remove the `name` column
+        Schema::table('companies', function (Blueprint $table) {
+            $table->dropColumn('name');
         });
     }
 }
